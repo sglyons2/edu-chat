@@ -1,7 +1,7 @@
 # Battle Plan:
 
 - [x] Write simple ncurses program
-- [ ] Main Window
+- [x] Main Window
 - [ ] Add ctrl+x exiting
 - [ ] Input Window
 - [ ] Add ctrl+enter for submitting input
