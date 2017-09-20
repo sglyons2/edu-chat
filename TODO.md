@@ -2,7 +2,7 @@
 
 - [x] Write simple ncurses program
 - [x] Main Window
-- [ ] Add ctrl+x exiting
+- [x] Add ctrl+x exiting
 - [ ] Input Window
 - [ ] Add ctrl+enter for submitting input
 - [ ] Message Window

@@ -5,14 +5,18 @@
 int main(int argc, char **argv)
 {
 	initscr();
-	cbreak();
+	raw();
 	keypad(stdscr, TRUE);
+	noecho();
 
 	refresh();
 
 	MainWindow main_win;
 
-	getch();
+	char ch;
+	while ((ch = getch()) != 24u) {
+		// do stuff
+	}
 
 	endwin();
 
