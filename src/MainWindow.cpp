@@ -41,3 +41,10 @@ void MainWindow::addCh(char c)
 {
 	this->input->addCh(c);
 }
+
+std::string MainWindow::getInput()
+{
+	std::string input = this->input->getText();
+	this->input->clearText();
+	return input;
+}

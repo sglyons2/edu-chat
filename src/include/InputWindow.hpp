@@ -16,6 +16,8 @@ public:
 	void refresh();
 	void print();
 	void addCh(char c);
+	std::string getText();
+	void clearText();
 };
 
 #endif

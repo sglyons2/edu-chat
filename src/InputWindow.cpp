@@ -44,4 +44,17 @@ void InputWindow::print()
 void InputWindow::addCh(char c)
 {
 	this->text += c;
+	this->print();
+}
+
+std::string InputWindow::getText()
+{
+	return this->text;
+}
+
+void InputWindow::clearText()
+{
+	this->text.clear();
+	wclear(this->window->window);
+	this->print();
 }

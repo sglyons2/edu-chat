@@ -16,6 +16,7 @@ public:
 	void resize(int height, int width);
 	void print();
 	void addCh(char c);
+	std::string getInput();
 };
 
 #endif
