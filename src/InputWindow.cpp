@@ -38,5 +38,10 @@ void InputWindow::resize(Window *parent)
 void InputWindow::print()
 {
 	box(this->window->window, 0, 0);
-	mvwprintw(this->window->window, 1, 1, "Hello from the InputWindow class");
+	mvwprintw(this->window->window, 1, 1, this->text.c_str());
+}
+
+void InputWindow::addCh(char c)
+{
+	this->text += c;
 }

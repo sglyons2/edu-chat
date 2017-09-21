@@ -18,6 +18,10 @@ int main(int argc, char **argv)
 
 	char ch;
 	while ((ch = getch()) != 24u) {
+		if ((ch >= 'a' && ch <= 'z') ||
+		    (ch >= 'A' && ch <= 'Z') ||
+		    (ch >= '0' && ch <= '9'))
+			main_win.addCh(ch);
 		refresh();
 		main_win.resize(LINES, COLS);
 		main_win.refresh();

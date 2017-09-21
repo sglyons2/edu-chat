@@ -36,3 +36,8 @@ void MainWindow::print()
 {
 	mvwprintw(this->window->window, 0, 0, "Hello from the MainWindow class!");
 }
+
+void MainWindow::addCh(char c)
+{
+	this->input->addCh(c);
+}

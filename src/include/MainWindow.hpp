@@ -15,6 +15,7 @@ public:
 	void refresh();
 	void resize(int height, int width);
 	void print();
+	void addCh(char c);
 };
 
 #endif
