@@ -1,6 +1,8 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
+#include <ncurses.h>
+
 struct Window {
 	WINDOW *window;
 	int height;
@@ -15,6 +17,11 @@ struct Window {
 		this->width = width;
 		this->begin_y = begin_y;
 		this->begin_x = begin_x;
+	}
+
+	~Window()
+	{
+		delwin(this->window);
 	}
 };
 

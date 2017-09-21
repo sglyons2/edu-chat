@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 			main_win.addCh(ch);
 		} else if (ch == 10u) { // Enter: send
 			std::string msg = main_win.getInput();
-			send(msg);
+			//send(msg);
 		}
 
 		if (old_LINES != LINES || old_COLS != COLS) {

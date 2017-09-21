@@ -10,7 +10,7 @@ InputWindow::InputWindow(Window *parent)
 
 InputWindow::~InputWindow()
 {
-	delwin(this->window->window);
+	delete this->window;
 }
 
 void InputWindow::refresh()

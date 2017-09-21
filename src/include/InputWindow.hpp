@@ -9,12 +9,12 @@ class InputWindow {
 private:
 	Window *window;
 	std::string text;
+	void print();
 public:
 	InputWindow(Window *parent);
 	~InputWindow();
 	void resize(Window *parent);
 	void refresh();
-	void print();
 	void addCh(char c);
 	std::string getText();
 	void clearText();

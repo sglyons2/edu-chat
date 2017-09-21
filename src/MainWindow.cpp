@@ -4,18 +4,21 @@ MainWindow::MainWindow()
 {
 	this->window = new Window(LINES, COLS, 0, 0);
 	this->print();
+	this->msg_win = new MessageWindow(this->window);
 	this->input = new InputWindow(this->window);
 }
 
 MainWindow::~MainWindow()
 {
 	delete this->input;
-	delwin(this->window->window);
+	delete this->msg_win;
+	delete this->window;
 }
 
 void MainWindow::refresh()
 {
 	wrefresh(this->window->window);
+	this->msg_win->refresh();
 	this->input->refresh();
 }
 
@@ -29,6 +32,7 @@ void MainWindow::resize(int height, int width)
 	wresize(window->window, window->height, window->width);
 	this->print();
 
+	this->msg_win->resize(window);
 	this->input->resize(window);
 }
 
@@ -46,5 +50,8 @@ std::string MainWindow::getInput()
 {
 	std::string input = this->input->getText();
 	this->input->clearText();
+
+	this->msg_win->addMessage(input);
+
 	return input;
 }
