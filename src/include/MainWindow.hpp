@@ -2,13 +2,19 @@
 #define MAINWINDOW_HPP
 
 #include <ncurses.h>
+#include "Window.hpp"
+#include "InputWindow.hpp"
 
 class MainWindow {
 private:
-	WINDOW *current;
+	InputWindow *input;
+	Window *window;
 public:
 	MainWindow();
 	~MainWindow();
+	void refresh();
+	void resize(int height, int width);
+	void print();
 };
 
 #endif

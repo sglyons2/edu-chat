@@ -4,13 +4,16 @@ LDFLAGS = -lncurses
 
 all: irc-chat
 
-irc-chat: irc-chat.o MainWindow.o
+irc-chat: irc-chat.o MainWindow.o InputWindow.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 irc-chat.o: irc-chat.cpp
 	$(CC) -c $(CFLAGS) $<
 
-MainWindow.o: MainWindow.cpp include/MainWindow.hpp
+MainWindow.o: MainWindow.cpp include/MainWindow.hpp include/Window.hpp
+	$(CC) -c $(CFLAGS) $<
+
+InputWindow.o: InputWindow.cpp include/InputWindow.hpp
 	$(CC) -c $(CFLAGS) $<
 
 .PHONY: clean cleanest
