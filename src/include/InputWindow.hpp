@@ -4,11 +4,13 @@
 #include <ncurses.h>
 #include "Window.hpp"
 #include <string>
+#include <vector>
 
 class InputWindow {
 private:
 	Window *window;
 	std::string text;
+	void formatMessage(std::vector<std::string>& lines, std::string line);
 	void print();
 public:
 	InputWindow(Window *parent);

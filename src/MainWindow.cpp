@@ -49,6 +49,8 @@ void MainWindow::addCh(char c)
 void MainWindow::delCh()
 {
 	this->input->delCh();
+	this->msg_win->resize(this->window);
+	this->input->resize(this->window);
 }
 
 std::string MainWindow::getInput()

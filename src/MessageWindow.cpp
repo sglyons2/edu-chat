@@ -31,18 +31,51 @@ void MessageWindow::resize(Window *parent)
 	this->print();
 }
 
+void MessageWindow::formatMessage(std::vector<std::string>& lines, std::string line)
+{
+	size_t str_len = this->window->width-2;
+
+	while (!line.empty()) {
+		// simple solution atm, just throw it in at str_len
+		// TODO: this, but better (space aware line change)
+		if (line.length() > str_len) {
+			std::string tmp = line.substr(0, str_len);
+			line = line.substr(str_len);
+			lines.push_back(tmp);
+		} else {
+			lines.push_back(line);
+			line.clear();
+		}
+	}
+}
+
 void MessageWindow::print()
 {
-	//box(this->window->window, 0, 0);
-	// TODO: this, but better
-	//mvwprintw(this->window->window, 1, 1, this->text.c_str());
-	mvwprintw(this->window->window, 1, 0, this->text.c_str());
+	box(this->window->window, 0, 0);
+	
+	std::vector<std::string> lines;
+	std::vector<std::string>::iterator it = this->text.begin();
+	for (; it < this->text.end(); ++it) {
+		this->formatMessage(lines, *it);
+	}
+
+	//size_t lines_begin = std::max((size_t) 0, lines.size()-(this->window->height-2));
+	size_t lines_begin;
+	if ((ssize_t) lines.size() < (ssize_t) this->window->height-2) {
+		lines_begin = 0;
+	} else {
+		lines_begin = lines.size()-(this->window->height-2);
+	}
+	for (size_t i = 0; i < (size_t) this->window->height-2; ++i) {
+		if (lines_begin+i >= lines.size())
+			break;
+		mvwprintw(this->window->window, i+1, 1, lines[lines_begin+i].c_str());
+	}
 }
 
 void MessageWindow::addMessage(std::string msg)
 {
-	// TODO: this, but better
-	this->text += msg + '\n';
+	this->text.push_back(msg);
 	this->print();
 }
 
