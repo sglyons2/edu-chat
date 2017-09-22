@@ -5,6 +5,6 @@
 - [x] Add ctrl+x exiting
 - [x] Input Window
 - [x] Add enter for submitting input
-- [ ] Message Window
+- [x] Message Window
 - [ ] Sockets (non-blocking)
 - [ ] Add ctrl+c for submitting connection
