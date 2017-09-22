@@ -24,7 +24,7 @@ void InputWindow::resize(Window *parent)
 
 	// NOTE: InputWindow is highest priority for view,
 	//       so can take up entire window.
-	window->height = std::min(window->height, parent->height);
+	window->height = std::min(window->height, std::max(parent->height, 3));
 	window->width = parent->width;
 	window->begin_y = parent->height-window->height;
 	window->begin_x = 0;
@@ -44,6 +44,13 @@ void InputWindow::print()
 void InputWindow::addCh(char c)
 {
 	this->text += c;
+	this->print();
+}
+
+void InputWindow::delCh()
+{
+	this->text = this->text.substr(0, this->text.length()-1);
+	wclear(this->window->window);
 	this->print();
 }
 

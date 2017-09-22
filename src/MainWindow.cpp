@@ -46,6 +46,11 @@ void MainWindow::addCh(char c)
 	this->input->addCh(c);
 }
 
+void MainWindow::delCh()
+{
+	this->input->delCh();
+}
+
 std::string MainWindow::getInput()
 {
 	std::string input = this->input->getText();

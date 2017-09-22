@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cctype>
 #include <ncurses.h>
 #include "include/MainWindow.hpp"
 
@@ -25,10 +26,10 @@ int main(int argc, char **argv)
 	int old_LINES = LINES;
 	int old_COLS = COLS;
 	while ((ch = getch()) != 24u) { // Ctrl+x: exit
-		if ((ch >= 'a' && ch <= 'z') ||
-		    (ch >= 'A' && ch <= 'Z') ||
-		    (ch >= '0' && ch <= '9')) {
+		if (isalnum(ch) || (isspace(ch) && ch != 10u) || ispunct(ch)) {
 			main_win.addCh(ch);
+		} else if (ch == 7u) {
+			main_win.delCh();	
 		} else if (ch == 10u) { // Enter: send
 			std::string msg = main_win.getInput();
 			//send(msg);

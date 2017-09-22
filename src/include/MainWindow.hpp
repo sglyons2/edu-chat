@@ -17,6 +17,7 @@ public:
 	void refresh();
 	void resize(int height, int width);
 	void addCh(char c);
+	void delCh();
 	std::string getInput();
 };
 

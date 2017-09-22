@@ -33,15 +33,16 @@ void MessageWindow::resize(Window *parent)
 
 void MessageWindow::print()
 {
-	box(this->window->window, 0, 0);
+	//box(this->window->window, 0, 0);
 	// TODO: this, but better
-	mvwprintw(this->window->window, 1, 1, this->text.c_str());
+	//mvwprintw(this->window->window, 1, 1, this->text.c_str());
+	mvwprintw(this->window->window, 1, 0, this->text.c_str());
 }
 
 void MessageWindow::addMessage(std::string msg)
 {
 	// TODO: this, but better
-	this->text += msg;
+	this->text += msg + '\n';
 	this->print();
 }
 

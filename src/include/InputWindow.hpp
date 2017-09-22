@@ -16,6 +16,7 @@ public:
 	void resize(Window *parent);
 	void refresh();
 	void addCh(char c);
+	void delCh();
 	std::string getText();
 	void clearText();
 };
