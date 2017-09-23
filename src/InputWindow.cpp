@@ -64,8 +64,6 @@ void InputWindow::formatMessage(std::vector<std::string>& lines, std::string lin
 
 void InputWindow::print()
 {
-	box(this->window->window, 0, 0);
-
 	std::vector<std::string> lines;
 	this->formatMessage(lines, this->text);
 
@@ -80,18 +78,7 @@ void InputWindow::print()
 		         0);
 	}
 
-	size_t lines_begin;
-	if ((ssize_t) lines.size() < (ssize_t) this->window->height-2) {
-		lines_begin = 0;
-	} else {
-		lines_begin = lines.size()-(this->window->height-2);
-	}
-
-	for (size_t i = 0; i < (size_t) this->window->height-2; ++i) {
-		if (lines_begin+i >= lines.size())
-			break;
-		mvwprintw(this->window->window, i+1, 1, lines[lines_begin+i].c_str());
-	}
+	this->window->print(lines, true);
 }
 
 void InputWindow::addCh(char c)

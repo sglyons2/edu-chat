@@ -2,6 +2,8 @@
 #define WINDOW_HPP
 
 #include <ncurses.h>
+#include <vector>
+#include <string>
 
 struct Window {
 	WINDOW *window;
@@ -12,6 +14,7 @@ struct Window {
 
 	Window(int height, int width, int begin_y, int begin_x);
 	~Window();
+	void print(std::vector<std::string>& lines, bool boxed);
 };
 
 #endif
