@@ -80,22 +80,6 @@ void InputWindow::print()
 		         0);
 	}
 
-
-	/*
-	if ((ssize_t) lines.size() > std::max(this->window->height-2, 3)) {
-		int begin_y = std::max((ssize_t) 0, (ssize_t) this->window->begin_y -
-		                                    ((ssize_t) lines.size() - 
-		                                    (this->window->height - 2)));
-		int height = (this->window->begin_y - begin_y) + this->window->height;
-
-		__resize(this->window,
-		         height,
-		         this->window->width,
-		         begin_y,
-		         0);
-	}
-	*/
-		         
 	size_t lines_begin;
 	if ((ssize_t) lines.size() < (ssize_t) this->window->height-2) {
 		lines_begin = 0;
