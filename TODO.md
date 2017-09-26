@@ -12,4 +12,5 @@
   - [ ] Use select for recv and send
   - [ ] Implement IRC specific stuff
 - [ ] Add ctrl+c for submitting connection
-- [ ] go from `this->member` to `member` notation
+- [ ] Go from `this->member` to `member` notation
+- [ ] Error handling
