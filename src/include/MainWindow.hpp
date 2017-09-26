@@ -4,6 +4,7 @@
 #include "Window.hpp"
 #include "InputWindow.hpp"
 #include "MessageWindow.hpp"
+#include "IRCSocket.hpp"
 
 class MainWindow {
 private:
@@ -11,6 +12,7 @@ private:
 	MessageWindow *msg_win;
 	Window *window;
 	void print();
+	IRCSocket *sock;
 public:
 	MainWindow();
 	~MainWindow();

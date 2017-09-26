@@ -40,6 +40,7 @@ int main(int argc, char **argv)
 			old_LINES = LINES;
 			old_COLS = COLS;
 		}
+
 		refresh();
 		main_win.refresh();
 	}

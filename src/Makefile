@@ -4,7 +4,8 @@ LDFLAGS = -lncurses
 
 all: irc-chat
 
-irc-chat: irc-chat.o MainWindow.o InputWindow.o MessageWindow.o Window.o
+irc-chat: irc-chat.o MainWindow.o InputWindow.o MessageWindow.o Window.o \
+          IRCSocket.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 irc-chat.o: irc-chat.cpp
@@ -20,6 +21,9 @@ MessageWindow.o: MessageWindow.cpp include/MessageWindow.hpp
 	$(CC) -c $(CFLAGS) $<
 
 Window.o: Window.cpp include/Window.hpp
+	$(CC) -c $(CFLAGS) $<
+
+IRCSocket.o: IRCSocket.cpp include/IRCSocket.hpp
 	$(CC) -c $(CFLAGS) $<
 
 .PHONY: clean cleanest

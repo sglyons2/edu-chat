@@ -6,10 +6,13 @@ MainWindow::MainWindow()
 	this->print();
 	this->msg_win = new MessageWindow(this->window);
 	this->input = new InputWindow(this->window);
+	sock = new IRCSocket();
+	sock->connect();
 }
 
 MainWindow::~MainWindow()
 {
+	delete sock;
 	delete this->input;
 	delete this->msg_win;
 	delete this->window;
@@ -17,15 +20,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::refresh()
 {
-	wrefresh(this->window->window);
+	print();
+	wrefresh(window->window);
 	this->msg_win->refresh();
 	this->input->refresh();
 }
 
 void MainWindow::resize(int height, int width)
 {
-	Window *window = this->window;
-
 	wclear(window->window);
 	window->height = height;
 	window->width = width;
@@ -38,7 +40,14 @@ void MainWindow::resize(int height, int width)
 
 void MainWindow::print()
 {
-	mvwprintw(this->window->window, 0, 0, "Hello from the MainWindow class!");
+	std::string status = "Not connected";
+	if (sock && sock->isConnected()) {
+		status = "Connected";
+	}
+	wmove(window->window, 0, 0);
+	wclrtoeol(window->window);
+	wrefresh(window->window);
+	mvwprintw(window->window, 0, 0, status.c_str());
 }
 
 void MainWindow::addCh(char c)

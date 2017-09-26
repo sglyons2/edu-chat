@@ -7,5 +7,9 @@
 - [x] Add enter for submitting input
 - [x] Message Window
 - [x] Read up on IRC protocol client requirements
-- [ ] Sockets (non-blocking)
+- [ ] IRCSockets
+  - [x] Simple connect
+  - [ ] Use select for recv and send
+  - [ ] Implement IRC specific stuff
 - [ ] Add ctrl+c for submitting connection
+- [ ] go from `this->member` to `member` notation
