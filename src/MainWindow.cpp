@@ -20,6 +20,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::refresh()
 {
+	sock->send();
+	std::string text = sock->recv();
+	if (!text.empty()) {
+		msg_win->addMessage(text);
+		msg_win->print();
+	}
 	print();
 	wrefresh(window->window);
 	this->msg_win->refresh();
@@ -64,10 +70,11 @@ void MainWindow::delCh()
 
 std::string MainWindow::getInput()
 {
-	std::string input = this->input->getText();
-	this->input->clearText();
+	std::string text = input->getText();
+	input->clearText();
 
-	this->msg_win->addMessage(input);
+	msg_win->addMessage(text);
+	sock->send(text);
 
-	return input;
+	return text;
 }

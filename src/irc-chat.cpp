@@ -11,8 +11,8 @@ void send(std::string msg)
 int main(int argc, char **argv)
 {
 	initscr();
-	halfdelay(10);
 	raw();
+	timeout(50);
 	keypad(stdscr, TRUE);
 	noecho();
 	curs_set(0);

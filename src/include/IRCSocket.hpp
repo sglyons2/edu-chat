@@ -2,6 +2,8 @@
 #define IRCSOCKET_HPP
 
 #include <sys/select.h>
+#include <string>
+#include <deque>
 
 class IRCSocket {
 private:
@@ -9,20 +11,16 @@ private:
 	fd_set readfds;
 	fd_set writefds;
 	bool connected;
+	bool isSet(fd_set *set);
+	std::deque<std::string> queue;
 public:
 	IRCSocket();
 	~IRCSocket();
 	void connect();
 	bool isConnected();
-	void recv();
+	std::string recv();
+	void send(std::string msg);
 	void send();
 };
-
-/*
-const struct timeval timeout = {
-	.tv_sec = 0,
-	.tv_usec = 0,
-};
-*/
 
 #endif

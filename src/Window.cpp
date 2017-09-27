@@ -16,6 +16,8 @@ Window::~Window()
 
 void Window::print(std::vector<std::string>& lines, bool boxed = false)
 {
+	wclear(window);
+
 	if (boxed) {
 		box(this->window, 0, 0);
 	}
