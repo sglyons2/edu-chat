@@ -12,19 +12,18 @@ void send(std::string msg)
 int main(int argc, char **argv)
 {
 	initscr();
-	raw();
-	timeout(50);
-	keypad(stdscr, TRUE);
 	noecho();
 	curs_set(0);
+	raw();
 
 	Window *win = new Window(LINES, COLS, 0, 0);
-	//MainWindow main_win;
+	keypad(win->window, TRUE);
+	wtimeout(win->window, 1);
+
 	ChatWindow chat_win;
 	chat_win.draw(win);
 
 	wrefresh(win->window);
-	//main_win.refresh();
 
 	int ch;
 	int old_LINES = LINES;
@@ -32,27 +31,21 @@ int main(int argc, char **argv)
 	while ((ch = wgetch(win->window)) != 24u) { // Ctrl+x: exit
 		if (isalnum(ch) || (isspace(ch) && ch != 10u) || ispunct(ch)) {
 			chat_win.handleInput(win, ch);
-			//main_win.addCh(ch);
-		} else if (ch == 7u) {
-			//main_win.delCh();	
+		} else if (ch == 7u) { // Backspace
+			chat_win.handleInput(win, ch);
 		} else if (ch == 10u) { // Enter: send
 			chat_win.handleInput(win, ch);
-			//std::string msg = main_win.getInput();
-			//send(msg);
 		}
 
 		if (old_LINES != LINES || old_COLS != COLS) {
-			//main_win.resize(LINES, COLS);
 			win->resize(LINES, COLS, 0, 0);
 			chat_win.draw(win);
 			old_LINES = LINES;
 			old_COLS = COLS;
 		}
 
-		chat_win.draw(win);
+		chat_win.refresh(win);
 		wrefresh(win->window);
-	//	chat_win.refresh(win);
-		//main_win.refresh();
 	}
 
 	delete win;

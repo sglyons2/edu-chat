@@ -1,5 +1,6 @@
 #include "include/ChatWindow.hpp"
 #include <cctype>
+#include <ctime>
 
 unsigned messages_draw_counter = 0;
 
@@ -47,6 +48,11 @@ void ChatWindow::drawStatusBar(Window *parent)
 {
 	clearRows(parent, parent->height-2, 1);
 	mvwprintw(parent->window, parent->height-2, 0, "status");
+	time_t cur_time = time(NULL);
+	struct tm *tm = localtime(&cur_time);
+	mvwprintw(parent->window, parent->height-2, parent->width-8,
+	          "%02u:%02u:%02u", tm->tm_hour, tm->tm_min, tm->tm_sec);
+	// Use attributes for color~
 	// limit info based on cols/width
 	// Priority:
 	//  1) Channel
