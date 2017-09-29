@@ -2,6 +2,7 @@
 #include <cctype>
 #include <ncurses.h>
 #include "include/MainWindow.hpp"
+#include "include/ChatWindow.hpp"
 
 void send(std::string msg)
 {
@@ -17,34 +18,44 @@ int main(int argc, char **argv)
 	noecho();
 	curs_set(0);
 
-	MainWindow main_win;
+	Window *win = new Window(LINES, COLS, 0, 0);
+	//MainWindow main_win;
+	ChatWindow chat_win;
+	chat_win.draw(win);
 
-	refresh();
-	main_win.refresh();
+	wrefresh(win->window);
+	//main_win.refresh();
 
-	char ch;
+	int ch;
 	int old_LINES = LINES;
 	int old_COLS = COLS;
-	while ((ch = getch()) != 24u) { // Ctrl+x: exit
+	while ((ch = wgetch(win->window)) != 24u) { // Ctrl+x: exit
 		if (isalnum(ch) || (isspace(ch) && ch != 10u) || ispunct(ch)) {
-			main_win.addCh(ch);
+			chat_win.handleInput(win, ch);
+			//main_win.addCh(ch);
 		} else if (ch == 7u) {
-			main_win.delCh();	
+			//main_win.delCh();	
 		} else if (ch == 10u) { // Enter: send
-			std::string msg = main_win.getInput();
+			chat_win.handleInput(win, ch);
+			//std::string msg = main_win.getInput();
 			//send(msg);
 		}
 
 		if (old_LINES != LINES || old_COLS != COLS) {
-			main_win.resize(LINES, COLS);
+			//main_win.resize(LINES, COLS);
+			win->resize(LINES, COLS, 0, 0);
+			chat_win.draw(win);
 			old_LINES = LINES;
 			old_COLS = COLS;
 		}
 
-		refresh();
-		main_win.refresh();
+		chat_win.draw(win);
+		wrefresh(win->window);
+	//	chat_win.refresh(win);
+		//main_win.refresh();
 	}
 
+	delete win;
 	endwin();
 
 	exit(EXIT_SUCCESS);

@@ -35,3 +35,13 @@ void Window::print(std::vector<std::string>& lines, bool boxed = false)
 		mvwprintw(this->window, i+(boxed?1:0), (boxed?1:0), lines[lines_begin+i].c_str());
 	}
 }
+
+void Window::resize(int height, int width, int begin_y, int begin_x)
+{
+	mvwin(window, begin_y, begin_x);
+	wresize(window, height, width);
+	this->height = height;
+	this->width = width;
+	this->begin_y = begin_y;
+	this->begin_x = begin_x;
+}

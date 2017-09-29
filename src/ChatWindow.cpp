@@ -1,6 +1,8 @@
 #include "include/ChatWindow.hpp"
 #include <cctype>
 
+unsigned messages_draw_counter = 0;
+
 ChatWindow::ChatWindow()
 {
 	// Will use entire space that parent has, so SAVE IT~
@@ -30,14 +32,21 @@ void ChatWindow::draw(Window *parent)
 void ChatWindow::drawMessages(Window *parent)
 {
 	clearRows(parent, 0, parent->height-2);
+
 	// draw last parent->rows-2 lines of messages
 	// Convert messages to lines until fill up last parent->rows-2 lines
 	// Draw lines
+	if (!messages.empty()) {
+		mvwprintw(parent->window, 0, 0, messages.back().c_str());
+	} else {
+		mvwprintw(parent->window, 0, 0, "messages");
+	}
 }
 
 void ChatWindow::drawStatusBar(Window *parent)
 {
 	clearRows(parent, parent->height-2, 1);
+	mvwprintw(parent->window, parent->height-2, 0, "status");
 	// limit info based on cols/width
 	// Priority:
 	//  1) Channel
@@ -53,12 +62,17 @@ void ChatWindow::drawInput(Window *parent)
 
 	// Use horizontal scrolling to have it consistent and usable
 	std::string visible;
-       	if (input.lenth() < parent->width-5) {
+
+       	if ((int) input.length() < parent->width-5) {
 		visible = input;
 	} else {
 		// TODO: support left<->right scrolling.
 		// gotta introduce cursor watching stuff for that.
-		visible = input.substr(input.length()-parent->width-5);
+		visible = input.substr(input.length()-(parent->width-5));
+	}
+
+	if (visible.empty()) {
+		visible = "input";
 	}
 
 	mvwprintw(parent->window, parent->height-1, 0, visible.c_str());
@@ -74,11 +88,11 @@ void ChatWindow::restoreCursor(Window *parent)
 	wmove(parent->window, cursor_y, cursor_x);
 }
 
-void ChatWindow::clearRows(Window *parent, int begin_y, int num_rows)
+void ChatWindow::clearRows(Window *parent, int begin_y, int num_lines)
 {
-	for (int i = 0; i < num_rows; i++) {
+	for (int i = 0; i < num_lines; i++) {
 		wmove(parent->window, begin_y+i, 0);
-		clrtoeol(parent->window);
+		wclrtoeol(parent->window);
 	}
 }
 
@@ -91,10 +105,11 @@ void ChatWindow::refresh(Window *parent)
 
 // Working with Input! Parent takes care of some, but not all! Passes the rest here!
 // Submit input for processing
-void ChatWindow::handleInput(Window *parent, char ch)
+void ChatWindow::handleInput(Window *parent, int ch)
 {
 	switch(ch) {
 		case KEY_ENTER:
+		case 10u:
 			// Refine this
 			addMessage(input);
 			input.clear();
@@ -103,6 +118,7 @@ void ChatWindow::handleInput(Window *parent, char ch)
 		default:
 			if (isalnum(ch) || ch == ' ') {
 				input += ch;
+				drawInput(parent);
 			}
 	}
 }

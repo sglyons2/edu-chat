@@ -5,7 +5,7 @@
 
 class ChatWindow {
 private:
-	IRCSocket socket;
+	IRCSocket *socket;
 	// To fix once I figure out how to format messages into an appropriate struct.
 	std::vector<std::string> messages; 
 	std::string input;
@@ -23,5 +23,5 @@ public:
 	~ChatWindow();
 	void draw(Window *parent);
 	void refresh(Window *parent);
-	void handleInput(Window *parent, char ch);
+	void handleInput(Window *parent, int ch);
 };

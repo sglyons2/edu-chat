@@ -15,6 +15,7 @@ struct Window {
 	Window(int height, int width, int begin_y, int begin_x);
 	~Window();
 	void print(std::vector<std::string>& lines, bool boxed);
+	void resize(int height, int width, int begin_y, int begin_x);
 };
 
 #endif
