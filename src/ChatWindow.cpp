@@ -12,6 +12,8 @@ ChatWindow::ChatWindow()
 	// to save, modify, then restore afterwards
 	// Create socket? Get ready?
 	socket = new IRCSocket();
+	init_pair(1, COLOR_RED, -1);
+	init_pair(2, COLOR_GREEN, -1);
 }
 
 ChatWindow::~ChatWindow()
@@ -47,19 +49,38 @@ void ChatWindow::drawMessages(Window *parent)
 void ChatWindow::drawStatusBar(Window *parent)
 {
 	clearRows(parent, parent->height-2, 1);
-	mvwprintw(parent->window, parent->height-2, 0, "status");
+	//mvwprintw(parent->window, parent->height-2, 0, "status");
 	time_t cur_time = time(NULL);
 	struct tm *tm = localtime(&cur_time);
-	mvwprintw(parent->window, parent->height-2, parent->width-8,
-	          "%02u:%02u:%02u", tm->tm_hour, tm->tm_min, tm->tm_sec);
 	// Use attributes for color~
 	// limit info based on cols/width
 	// Priority:
 	//  1) Channel
-	//  2) Server
+	//  2) Time
 	//  3) Nickname
-	//  4) Time
+	//  4) Server
 	//  Channel, Server, Nickname can be taken from IRCSocket?
+	
+	// TODO: cleanup
+	std::string channel = "#channel";
+	std::string nickname = "nick";
+	std::string server = "irc.fake.com";
+	int y = parent->height-2;
+	int x = 0;
+	mvwprintw(parent->window, y, x, nickname.c_str());
+	x += nickname.length();
+	mvwprintw(parent->window, y, x, "@");
+	x++;
+	int pair = socket->isConnected() ? 2 : 1;
+	wattron(parent->window, COLOR_PAIR(pair) | A_BOLD);
+	mvwprintw(parent->window, y, x, server.c_str());
+	wattroff(parent->window, COLOR_PAIR(pair) | A_BOLD);
+	x += server.length();
+	mvwprintw(parent->window, y, x, "/");
+	x++;
+	mvwprintw(parent->window, y, x, channel.c_str());
+	mvwprintw(parent->window, parent->height-2, parent->width-8,
+	          "%02u:%02u:%02u", tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
 
 void ChatWindow::drawInput(Window *parent)

@@ -15,6 +15,8 @@ int main(int argc, char **argv)
 	noecho();
 	curs_set(0);
 	raw();
+	start_color();
+	use_default_colors();
 
 	Window *win = new Window(LINES, COLS, 0, 0);
 	keypad(win->window, TRUE);
