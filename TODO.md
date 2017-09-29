@@ -7,13 +7,21 @@
 - [x] Add enter for submitting input
 - [x] Message Window
 - [x] Read up on IRC protocol client requirements
-- [ ] IRCSockets (non-blocking)
+- [x] IRCSockets (non-blocking)
   - [x] Simple connect
-  - [ ] Implement IRC specific stuff
-- [ ] Consider simplified syntax for IRC and client commands
-- [ ] Add ctrl+c for submitting connection
-  - See simplified syntax for alternate solution
-- [ ] Add command arguments for program
+- [ ] It works in a basic way!!! Reimagining time!!!!
+  - [ ] Change windowing system. Don't know what I was thinking.
+    - [ ] Format: Messages - 1 line status "bar" - 1 line input
+      - [ ] Messages displayed [time] nickname : message or similar with hanging lines
+      - [ ] Status bar specifies server, channel (color for connection status), nickname, and current time.
+      - [ ] Input increased size issue: expand or horizontal scroll effect?
+  - [ ] Introduce syntax to simplify user control
+    - [ ] IRC commands
+    - [ ] Escape to type full message, unsimplified (like typing into telnet)
+    - [ ] Connection commands
+- [ ] Introduce command line arguments for:
+  - [ ] Connection
+  - [ ] IRC channel, nickname
 - [ ] Add help info
 - [ ] Go from `this->member` to `member` notation
 - [ ] Error handling
