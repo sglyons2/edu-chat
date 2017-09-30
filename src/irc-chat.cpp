@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 {
 	initscr();
 	noecho();
-	curs_set(0);
+	//curs_set(0);
 	raw();
 	start_color();
 	use_default_colors();
