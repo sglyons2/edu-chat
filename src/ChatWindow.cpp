@@ -2,7 +2,7 @@
 #include <cctype>
 #include <ctime>
 
-unsigned messages_draw_counter = 0;
+enum CONN_STATUS { NO_CONN=1, IS_CONN };
 
 ChatWindow::ChatWindow()
 {
@@ -12,8 +12,8 @@ ChatWindow::ChatWindow()
 	// to save, modify, then restore afterwards
 	// Create socket? Get ready?
 	socket = new IRCSocket();
-	init_pair(1, COLOR_RED, -1);
-	init_pair(2, COLOR_GREEN, -1);
+	init_pair(NO_CONN, COLOR_RED, -1);
+	init_pair(IS_CONN, COLOR_GREEN, -1);
 }
 
 ChatWindow::~ChatWindow()
@@ -67,18 +67,24 @@ void ChatWindow::drawStatusBar(Window *parent)
 	std::string server = "irc.fake.com";
 	int y = parent->height-2;
 	int x = 0;
-	mvwprintw(parent->window, y, x, nickname.c_str());
-	x += nickname.length();
-	mvwprintw(parent->window, y, x, "@");
-	x++;
-	int pair = socket->isConnected() ? 2 : 1;
-	wattron(parent->window, COLOR_PAIR(pair) | A_BOLD);
-	mvwprintw(parent->window, y, x, server.c_str());
-	wattroff(parent->window, COLOR_PAIR(pair) | A_BOLD);
-	x += server.length();
-	mvwprintw(parent->window, y, x, "/");
-	x++;
-	mvwprintw(parent->window, y, x, channel.c_str());
+	if (!socket->nickname.empty()) {
+		mvwprintw(parent->window, y, x, nickname.c_str());
+		x += nickname.length();
+		mvwprintw(parent->window, y, x, "@");
+		x++;
+	}
+	if (!socket->server.empty()) {
+		int pair = socket->isConnected() ? IS_CONN : NO_CONN;
+		wattron(parent->window, COLOR_PAIR(pair) | A_BOLD);
+		mvwprintw(parent->window, y, x, server.c_str());
+		wattroff(parent->window, COLOR_PAIR(pair) | A_BOLD);
+		x += server.length();
+		mvwprintw(parent->window, y, x, "/");
+		x++;
+	}
+	if (!socket->nickname.empty()) {
+		mvwprintw(parent->window, y, x, channel.c_str());
+	}
 	mvwprintw(parent->window, parent->height-2, parent->width-8,
 	          "%02u:%02u:%02u", tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
@@ -128,6 +134,12 @@ void ChatWindow::refresh(Window *parent)
 	// technically is parent's refresh, but we can also do work here~
 	// do a lot of the work here
 	drawStatusBar(parent); // update time and status every time
+	socket->send();
+	std::string recv = socket->recv();
+	if (!recv.empty()) {
+		addMessage(recv);
+		drawMessages(parent);
+	}
 }
 
 // Working with Input! Parent takes care of some, but not all! Passes the rest here!
@@ -137,17 +149,25 @@ void ChatWindow::handleInput(Window *parent, int ch)
 	switch(ch) {
 		case KEY_ENTER:
 		case 10u:
-			// Refine this
-			addMessage(input);
-			input.clear();
-			draw(parent);
+			submitInput(parent);
 			break;
 		default:
-			if (isalnum(ch) || ch == ' ') {
+			if (isalnum(ch) || ispunct(ch) || ch == ' ') {
 				input += ch;
 				drawInput(parent);
 			}
 	}
+}
+
+void ChatWindow::submitInput(Window *parent)
+{
+	if (input.find("/connect ") == 0) {
+		socket->connect(input.substr(9), "#hello", "nick");
+	} else {
+		addMessage(input);
+	}
+	input.clear();
+	draw(parent);
 }
 
 // Adding Messages!

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cstdlib>
 #include "include/IRCSocket.hpp"
+#include <ncurses.h>
 
 IRCSocket::IRCSocket()
 {
@@ -22,6 +23,15 @@ IRCSocket::~IRCSocket()
 	close(sockfd);
 }
 
+void IRCSocket::connect(std::string server, std::string channel, std::string nickname)
+{
+	this->server = server;
+	this->channel = channel;
+	this->nickname = nickname;
+
+	connect();
+}
+
 void IRCSocket::connect()
 {
 	struct addrinfo hints, *servinfo;
@@ -29,8 +39,11 @@ void IRCSocket::connect()
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	int rv = getaddrinfo("127.0.0.1", "6667", &hints, &servinfo);
+	int rv = getaddrinfo(server.c_str(), "6667", &hints, &servinfo);
 	if (rv) {
+		int e = errno;
+		mvprintw(0, 0, "Error: getaddrinfo %d %d %s %s", rv, e, gai_strerror(rv), server.c_str());
+		getch();
 		exit(1);
 	}
 
@@ -40,9 +53,9 @@ void IRCSocket::connect()
 		switch(e) {
 			case EISCONN:
 				connected = true;
-				queue.push_back(std::string("NICK test"));
+				queue.push_back(std::string("NICK ")+nickname);
 				queue.push_back(std::string("USER test test_ test__ :Testy McTest"));
-				queue.push_back(std::string("JOIN #hello"));
+				queue.push_back(std::string("JOIN ") + channel);
 			case EAGAIN:
 			case EALREADY:
 			case EINPROGRESS:
@@ -56,9 +69,9 @@ void IRCSocket::connect()
 		}
 	} else {
 		connected = true;
-		queue.push_back(std::string("NICK test"));
+		queue.push_back(std::string("NICK ")+ nickname);
 		queue.push_back(std::string("USER test test_ test__ :Testy McTest"));
-		queue.push_back(std::string("JOIN #hello"));
+		queue.push_back(std::string("JOIN ")+ channel);
 	}
 
 	freeaddrinfo(servinfo);
@@ -73,7 +86,7 @@ bool IRCSocket::isConnected()
 
 void IRCSocket::send()
 {
-	if (!queue.empty()) {
+	if (isSetup() && !queue.empty()) {
 		std::string current = queue.front() + "\r\n";
 		queue.pop_front();
 		int numbytes = ::send(sockfd, current.c_str(), current.length(), MSG_NOSIGNAL);
@@ -103,8 +116,15 @@ void IRCSocket::send(std::string msg)
 	send();
 }
 
+bool IRCSocket::isSetup()
+{
+	return !server.empty() && !channel.empty() && !nickname.empty();
+}
 std::string IRCSocket::recv()
 {
+	if (!isSetup()) {
+		return "";
+	}
 	if (!connected) {
 		connect();
 		return "";

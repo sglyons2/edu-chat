@@ -17,6 +17,7 @@ private:
 	void saveCursor(Window *parent);
 	void restoreCursor(Window *parent);
 	void clearRows(Window *parent, int begin_y, int num_rows);
+	void submitInput(Window *parent);
 	void addMessage(std::string raw_msg);
 public:
 	ChatWindow();
