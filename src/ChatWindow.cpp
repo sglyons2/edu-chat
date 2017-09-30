@@ -214,3 +214,16 @@ void ChatWindow::addMessage(std::string raw_msg)
 	Message tmp(time(NULL), "anon", raw_msg);
 	messages.push_back(tmp);
 }
+
+void ChatWindow::processSend(std::string raw_msg)
+{
+	// if starts with /
+		// tokenize
+	// else make it into a privmsg
+}
+
+void ChatWindow::processRecv(std::string raw_msg)
+{
+	// tokenize
+	// response response_number more
+}

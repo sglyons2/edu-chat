@@ -41,6 +41,8 @@ private:
 	void clearRows(Window *parent, int begin_y, int num_rows);
 	void submitInput(Window *parent);
 	void addMessage(std::string raw_msg);
+	void processSend(std::string raw_msg);
+	void processRecv(std::string raw_msg);
 public:
 	ChatWindow();
 	~ChatWindow();

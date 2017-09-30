@@ -147,6 +147,8 @@ std::string IRCSocket::recv()
 		connected = false;
 		return std::string("");
 	}
+	// TODO: should i be checking if it ends with \r\n????
+	//       otherwise i'm not sure if it's done?
 	buf[numbytes] = '\0';
 
 	for (char *p = &buf[0]; *p != '\0'; p++) {
