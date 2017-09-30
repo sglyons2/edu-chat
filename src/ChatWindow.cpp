@@ -98,10 +98,10 @@ void ChatWindow::drawStatusBar(Window *parent)
 		mvwprintw(parent->window, y, x, server.c_str());
 		wattr_off(parent->window, COLOR_PAIR(pair) | A_BOLD, NULL);
 		x += server.length();
-		mvwprintw(parent->window, y, x, "/");
-		x++;
 	}
 	if (!socket->nickname.empty()) {
+		mvwprintw(parent->window, y, x, "/");
+		x++;
 		mvwprintw(parent->window, y, x, channel.c_str());
 	}
 	mvwprintw(parent->window, parent->height-2, parent->width-8,
@@ -194,9 +194,12 @@ void ChatWindow::handleInput(Window *parent, int ch)
 
 void ChatWindow::submitInput(Window *parent)
 {
+	// check for commands
 	if (input.find("/connect ") == 0) {
 		socket->connect(input.substr(9), "#hello", "nick");
 	} else {
+		// translate into Message for messages
+		// translate into raw message for sending to server
 		addMessage(input);
 		socket->send(input);
 	}
