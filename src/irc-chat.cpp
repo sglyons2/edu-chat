@@ -1,13 +1,7 @@
 #include <cstdlib>
 #include <cctype>
 #include <ncurses.h>
-#include "include/MainWindow.hpp"
 #include "include/ChatWindow.hpp"
-
-void send(std::string msg)
-{
-	mvprintw(2, 0, "Sent Message: %s", msg.c_str());
-}
 
 int main(int argc, char **argv)
 {
