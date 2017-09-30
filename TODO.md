@@ -25,3 +25,4 @@
 - [ ] Add help info
 - [ ] Go from `this->member` to `member` notation
 - [ ] Error handling
+  - [ ] Fix exit on connection closed
