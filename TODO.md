@@ -11,10 +11,11 @@
   - [x] Simple connect
 - [ ] It works in a basic way!!! Reimagining time!!!!
   - [ ] Change windowing system. Don't know what I was thinking.
-    - [ ] Format: Messages - 1 line status "bar" - 1 line input
+    - [x] Format: Messages - 1 line status "bar" - 1 line input
       - [ ] Messages displayed [time] nickname : message or similar with hanging lines
-      - [ ] Status bar specifies server, channel (color for connection status), nickname, and current time.
+      - [x] Status bar specifies server, channel (color for connection status), nickname, and current time.
       - [x] Input increased size issue: expand or horizontal scroll effect?
+  - [ ] Modify IRCSocket to connect to server, then user will do NICK and JOIN commands
   - [ ] Introduce syntax to simplify user control
     - [ ] IRC commands
     - [ ] Escape to type full message, unsimplified (like typing into telnet)
