@@ -16,8 +16,8 @@ ChatWindow::ChatWindow()
 	// solarized colors changing the colors from what is expected.
 	// 197 = Red
 	// 35 = Green
-	init_pair(NO_CONN, 197, -1);
-	init_pair(IS_CONN, 35, -1);
+	init_pair(NO_CONN, -1, 197);
+	init_pair(IS_CONN, -1, 35);
 }
 
 ChatWindow::~ChatWindow()
@@ -82,6 +82,10 @@ void ChatWindow::drawStatusBar(Window *parent)
 	std::string server = socket->server;
 	int y = parent->height-2;
 	int x = 0;
+	wattr_on(parent->window, A_STANDOUT, NULL);
+	for(int i = 0; i < parent->width; i++) {
+		mvwaddch(parent->window, y, i, ' ');
+	}
 	if (!socket->nickname.empty()) {
 		mvwprintw(parent->window, y, x, nickname.c_str());
 		x += nickname.length();
@@ -102,6 +106,7 @@ void ChatWindow::drawStatusBar(Window *parent)
 	}
 	mvwprintw(parent->window, parent->height-2, parent->width-8,
 	          "%02u:%02u:%02u", tm->tm_hour, tm->tm_min, tm->tm_sec);
+	wattr_off(parent->window, A_STANDOUT, NULL);
 	restoreCursor(parent);
 }
 
@@ -171,6 +176,13 @@ void ChatWindow::handleInput(Window *parent, int ch)
 	case KEY_ENTER:
 	case 10u:
 		submitInput(parent);
+		break;
+	case KEY_BACKSPACE:
+	case 7u:
+		if (!input.empty()) {
+			input.pop_back();
+			drawInput(parent);
+		}
 		break;
 	default:
 		if (isalnum(ch) || ispunct(ch) || ch == ' ') {

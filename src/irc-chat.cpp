@@ -37,6 +37,8 @@ int main(int argc, char **argv)
 			chat_win.handleInput(win, ch);
 		} else if (ch == 10u) { // Enter: send
 			chat_win.handleInput(win, ch);
+		} else {
+			chat_win.handleInput(win, ch);
 		}
 
 		if (old_LINES != LINES || old_COLS != COLS) {
