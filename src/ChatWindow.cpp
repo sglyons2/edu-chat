@@ -1,8 +1,7 @@
 #include "include/ChatWindow.hpp"
 #include <cctype>
-#include <ctime>
 
-enum CONN_STATUS { NO_CONN=1, IS_CONN };
+enum CONN_STATUS { NO_CONN=1, IS_CONN=2 };
 
 ChatWindow::ChatWindow()
 {
@@ -12,8 +11,12 @@ ChatWindow::ChatWindow()
 	// to save, modify, then restore afterwards
 	// Create socket? Get ready?
 	socket = new IRCSocket();
-	init_pair(NO_CONN, COLOR_RED, -1);
-	init_pair(IS_CONN, COLOR_GREEN, -1);
+	// Other colors picked to avoid a bit of typical customization like
+	// solarized colors changing the colors from what is expected.
+	// 197 = Red
+	// 35 = Green
+	init_pair(NO_CONN, 197, -1);
+	init_pair(IS_CONN, 35, -1);
 }
 
 ChatWindow::~ChatWindow()
@@ -40,7 +43,18 @@ void ChatWindow::drawMessages(Window *parent)
 	// Convert messages to lines until fill up last parent->rows-2 lines
 	// Draw lines
 	if (!messages.empty()) {
-		mvwprintw(parent->window, 0, 0, messages.back().c_str());
+		// translate to lines
+		// then work with last parents->height-2 lines
+
+		if ((int) messages.size() > parent->height-2) {
+			for (int i = 0; i <= parent->height-2; i++) {
+				mvwprintw(parent->window, parent->height-2 + parent->begin_y - i, 0, messages[messages.size()-i].getMessage().c_str());
+			}
+		} else {
+			for (size_t i = 0; i < messages.size(); i++) {
+				mvwprintw(parent->window, parent->begin_y + i, 0, messages[i].getMessage().c_str());
+			}
+		}
 	} else {
 		mvwprintw(parent->window, 0, 0, "messages");
 	}
@@ -49,7 +63,7 @@ void ChatWindow::drawMessages(Window *parent)
 void ChatWindow::drawStatusBar(Window *parent)
 {
 	clearRows(parent, parent->height-2, 1);
-	//mvwprintw(parent->window, parent->height-2, 0, "status");
+
 	time_t cur_time = time(NULL);
 	struct tm *tm = localtime(&cur_time);
 	// Use attributes for color~
@@ -75,9 +89,9 @@ void ChatWindow::drawStatusBar(Window *parent)
 	}
 	if (!socket->server.empty()) {
 		int pair = socket->isConnected() ? IS_CONN : NO_CONN;
-		wattron(parent->window, COLOR_PAIR(pair) | A_BOLD);
+		wattr_on(parent->window, COLOR_PAIR(pair) | A_BOLD, NULL);
 		mvwprintw(parent->window, y, x, server.c_str());
-		wattroff(parent->window, COLOR_PAIR(pair) | A_BOLD);
+		wattr_off(parent->window, COLOR_PAIR(pair) | A_BOLD, NULL);
 		x += server.length();
 		mvwprintw(parent->window, y, x, "/");
 		x++;
@@ -165,6 +179,7 @@ void ChatWindow::submitInput(Window *parent)
 		socket->connect(input.substr(9), "#hello", "nick");
 	} else {
 		addMessage(input);
+		socket->send(input);
 	}
 	input.clear();
 	draw(parent);
@@ -174,5 +189,6 @@ void ChatWindow::submitInput(Window *parent)
 void ChatWindow::addMessage(std::string raw_msg)
 {
 	// refine this with IRC specifics or run it through something like IRCFormatter
-	messages.push_back(raw_msg);
+	Message tmp(time(NULL), "anon", raw_msg);
+	messages.push_back(tmp);
 }

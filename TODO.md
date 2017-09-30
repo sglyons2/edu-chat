@@ -14,7 +14,7 @@
     - [ ] Format: Messages - 1 line status "bar" - 1 line input
       - [ ] Messages displayed [time] nickname : message or similar with hanging lines
       - [ ] Status bar specifies server, channel (color for connection status), nickname, and current time.
-      - [ ] Input increased size issue: expand or horizontal scroll effect?
+      - [x] Input increased size issue: expand or horizontal scroll effect?
   - [ ] Introduce syntax to simplify user control
     - [ ] IRC commands
     - [ ] Escape to type full message, unsimplified (like typing into telnet)

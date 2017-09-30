@@ -120,6 +120,7 @@ bool IRCSocket::isSetup()
 {
 	return !server.empty() && !channel.empty() && !nickname.empty();
 }
+
 std::string IRCSocket::recv()
 {
 	if (!isSetup()) {
@@ -153,5 +154,12 @@ std::string IRCSocket::recv()
 			*p = ' ';
 	}
 
-	return std::string(buf);
+	std::string tmp = buf;
+
+	if (tmp.find("PING") == 0) {
+		queue.push_back("PONG");	
+		return "";
+	}
+
+	return tmp;
 }

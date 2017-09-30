@@ -1,13 +1,35 @@
+#ifndef CHATWINDOW_HPP
+#define CHATWINDOW_HPP
+
 #include "IRCSocket.hpp"
 #include "Window.hpp"
 #include <vector>
 #include <string>
+#include <ctime>
+
+class Message {
+private:
+	time_t timestamp;
+	std::string owner;
+	std::string message;
+public:
+	Message(time_t timestamp, std::string owner, std::string message)
+	{
+		this->timestamp = timestamp;
+		this->owner = owner;
+		this->message = message;
+	};
+	time_t getTimestamp() { return timestamp; };
+	std::string getOwner() { return owner; };
+	std::string getMessage() { return message; };
+};
 
 class ChatWindow {
 private:
 	IRCSocket *socket;
 	// To fix once I figure out how to format messages into an appropriate struct.
-	std::vector<std::string> messages; 
+	bool showTime;
+	std::vector<Message> messages; 
 	std::string input;
 	int cursor_y;
 	int cursor_x;
@@ -26,3 +48,5 @@ public:
 	void refresh(Window *parent);
 	void handleInput(Window *parent, int ch);
 };
+
+#endif
