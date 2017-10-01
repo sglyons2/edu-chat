@@ -213,6 +213,11 @@ void ChatWindow::addMessage(std::string raw_msg)
 	// refine this with IRC specifics or run it through something like IRCFormatter
 	Message tmp(time(NULL), "anon", raw_msg);
 	messages.push_back(tmp);
+	// TODO: change 100 to a max (not going to just remove what no longer fits,
+	//       as window resizing it supported).
+	if (messages.size() > 100) {
+		messages.erase(messages.begin(), messages.end()-99);
+	}
 }
 
 void ChatWindow::processSend(std::string raw_msg)
