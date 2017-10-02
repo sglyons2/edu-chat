@@ -121,6 +121,11 @@ bool IRCSocket::isSetup()
 	return !server.empty() && !channel.empty() && !nickname.empty();
 }
 
+// TODO: consider using MSG_PEEK to get connection and other receive statuses
+//       before recieving.
+//       Can also use it in a more... get/set/refresh status kinda function that
+//       is accessible.
+//       connected, ready_send, ready_recv
 std::string IRCSocket::recv()
 {
 	if (!isSetup()) {
