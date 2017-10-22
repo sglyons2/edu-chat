@@ -18,16 +18,11 @@ namespace educhat {
 		std::string recv();
 	private:
 		int sockfd;
-		fd_set readfds;
-		fd_set writefds;
 		bool connected;
 		bool send_rdy;
 		bool recv_rdy;
-		bool isSet(fd_set *set);
 		void send();
-		std::deque<std::string> queue;
-		bool isSetup();
-		void updateStatus();
+		std::deque<std::string> to_send;
 	};
 
 } // namespace educhat

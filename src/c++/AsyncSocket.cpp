@@ -76,15 +76,16 @@ namespace educhat {
 	void AsyncSocket::send(const std::string msg)
 	{
 		if (!msg.empty())
-			queue.push_back(msg);
+			to_send.push_back(msg);
+
 		send();
 	}
 
 	void AsyncSocket::send()
 	{
-		if (isConnected() && send_rdy && !queue.empty()) {
-			const std::string msg = queue.front();
-			queue.pop_front();
+		if (connected && send_rdy && !to_send.empty()) {
+			const std::string msg = to_send.front();
+			to_send.pop_front();
 
 			int numbytes = ::send(sockfd, msg.c_str(), msg.length(), MSG_NOSIGNAL);
 
@@ -92,7 +93,7 @@ namespace educhat {
 				int e = errno;
 				switch(e) {
 					case EAGAIN:
-						queue.push_front(msg);
+						to_send.push_front(msg);
 						break;
 					default:
 						// TODO: handle more and better
@@ -101,7 +102,7 @@ namespace educhat {
 				}
 			} else {
 				if (numbytes < (int) msg.length()) {
-					queue.push_front(msg.substr(numbytes));
+					to_send.push_front(msg.substr(numbytes));
 				}
 			}
 		}
