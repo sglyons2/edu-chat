@@ -58,47 +58,62 @@ namespace educhat {
 	void AsioSocket::send(const std::string msg)
 	{
 		if (!msg.empty()) {
+			to_send_m.lock(); // TODO don't like this.... might need to return error on a failed try_lock() instead.
 			to_send.push_back(msg);
 			std::cout << "message queued: " << msg.substr(0, msg.length()-2) << '\n';
+			to_send_m.unlock();
+			doSend();
 		}
-
-		if (to_send.empty() || send_in_progress)
-			return;
-
-		doSend();
 	}
 
 
 	void AsioSocket::doSend()
 	{
-		send_in_progress = true;
+		if (send_in_progress)
+			return;
 
-		std::cout << "sending: " << to_send.front().substr(0, to_send.front().length()-2) << "\n";
+		to_send_m.lock(); // TODO: remove and introduce a try_lock() and way to show failure to caller
 
-		boost::asio::async_write(socket,
-			boost::asio::buffer(to_send.front().c_str(),
-				to_send.front().length()),
-			[this](boost::system::error_code ec, std::size_t)
-			{
-				if (!ec) {
-					std::cout << "sent: " << to_send.front();
-					to_send.pop_front();
-					send_in_progress = false;
-				} else {
-					std::cout << "send err\n";
-					socket.close();
-					exit(1);
-				}
-			});
+		if (!to_send.empty()) {
+			send_in_progress = true;
+	
+			std::cout << "sending: " << to_send.front().substr(0, to_send.front().length()-2) << "\n";
+	
+			boost::asio::async_write(socket,
+				boost::asio::buffer(to_send.front().c_str(),
+					to_send.front().length()),
+				[this](boost::system::error_code ec, std::size_t)
+				{
+					if (!ec) {
+						std::cout << "sent: " << to_send.front();
+						to_send_m.lock();
+						to_send.pop_front();
+						to_send_m.unlock();
+						send_in_progress = false;
+						doSend();
+
+					} else {
+						std::cout << "send err\n";
+						socket.close();
+						exit(1);
+					}
+				});
+		}
+
+		to_send_m.unlock();	
 	}
 
 	std::string AsioSocket::recv()
 	{
+		// TODO: introduce error when can't receive
 		std::string msg = "";
 
-		if (!to_recv.empty()) {
-			msg = to_recv.front();
-			to_recv.pop_front();
+		if (to_recv_m.try_lock()) {
+		       	if(!to_recv.empty()) {
+				msg = to_recv.front();
+				to_recv.pop_front();
+			}
+			to_recv_m.unlock();
 		}
 
 		return msg;
@@ -106,8 +121,9 @@ namespace educhat {
 
 	void AsioSocket::doRecv()
 	{
-		if (recv_in_progress)
+		if (recv_in_progress) {
 			return;
+		}
 
 		recv_in_progress = true;
 
@@ -116,11 +132,15 @@ namespace educhat {
 			[this](boost::system::error_code ec, std::size_t len)
 			{
 				if (!ec) {
-					for (std::size_t i = len; i < RECVMSG_MAXLENGTH; ++i) {
-						recv_msg[i] = '\0';
+					if (len > 0) {
+						for (std::size_t i = len; i < RECVMSG_MAXLENGTH; ++i) {
+							recv_msg[i] = '\0';
+						}
+	
+						to_recv_m.lock();
+						to_recv.push_back(recv_msg);
+						to_recv_m.unlock();
 					}
-
-					to_recv.push_back(recv_msg);
 					
 					recv_in_progress = false;
 					doRecv();
@@ -130,6 +150,7 @@ namespace educhat {
 					exit(1);
 				}
 			});
+
 	}
 
 } // namespace educhat

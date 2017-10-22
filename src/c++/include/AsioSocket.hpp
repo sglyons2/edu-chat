@@ -2,6 +2,7 @@
 #define EDUCHAT_ASIOSOCKET_HPP
 
 #include <deque>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -27,13 +28,15 @@ namespace educhat {
 		boost::asio::io_service io_service;
 		boost::asio::ip::tcp::socket socket;
 		bool connected;
+		std::thread *t;
 		bool connect_in_progress;
 		bool send_in_progress;
 		bool recv_in_progress;
 		std::deque<std::string> to_send;
+		std::mutex to_send_m;
 		char recv_msg[RECVMSG_MAXLENGTH];
 		std::deque<std::string> to_recv;
-		std::thread *t;
+		std::mutex to_recv_m;
 	};
 
 } // namespace educhat
