@@ -69,8 +69,9 @@ namespace educhat {
 
 	void AsioSocket::doSend()
 	{
-		if (send_in_progress)
+		if (send_in_progress) {
 			return;
+		}
 
 		to_send_m.lock(); // TODO: remove and introduce a try_lock() and way to show failure to caller
 
@@ -90,6 +91,7 @@ namespace educhat {
 						to_send.pop_front();
 						to_send_m.unlock();
 						send_in_progress = false;
+
 						doSend();
 
 					} else {
