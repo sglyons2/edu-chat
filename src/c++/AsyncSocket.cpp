@@ -84,16 +84,15 @@ namespace educhat {
 	void AsyncSocket::send(const std::string msg)
 	{
 		if (!msg.empty()) {
-			to_send_m.lock();
+			std::lock_guard<std::mutex> lock(to_send_m);
 			to_send.push_back(msg);
-			to_send_m.unlock();
 		}
 	}
 
 	void AsyncSocket::doSend()
 	{
 		if (connected) {
-			to_send_m.lock();
+			std::lock_guard<std::mutex> lock(to_send_m);
 			if (!to_send.empty()) {
 				const std::string msg = to_send.front();
 				to_send.pop_front();
@@ -117,7 +116,6 @@ namespace educhat {
 					}
 				}
 			}
-			to_send_m.unlock();
 		}
 	}
 
@@ -139,7 +137,7 @@ namespace educhat {
 	void AsyncSocket::doRecv()
 	{
 		if (connected) {
-			to_recv_m.lock();
+			std::lock_guard<std::mutex> lock(to_recv_m);
 			char buf[MAXDATASIZE];
 			int numbytes = ::recv(sockfd, buf, MAXDATASIZE-1, 0);
 			if (numbytes == -1) {
@@ -158,8 +156,6 @@ namespace educhat {
 				buf[numbytes] = '\0';
 				to_recv.push_back(buf);
 			}
-
-			to_recv_m.unlock();
 		}
 	}
 

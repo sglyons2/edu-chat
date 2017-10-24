@@ -1,5 +1,6 @@
-#include "include/AsioSocket.hpp"
 #include <iostream>
+
+#include "include/AsioSocket.hpp"
 
 namespace educhat {
 
@@ -58,10 +59,11 @@ namespace educhat {
 	void AsioSocket::send(const std::string msg)
 	{
 		if (!msg.empty()) {
-			to_send_m.lock(); // TODO don't like this.... might need to return error on a failed try_lock() instead.
-			to_send.push_back(msg);
-			std::cout << "message queued: " << msg.substr(0, msg.length()-2) << '\n';
-			to_send_m.unlock();
+			{
+				std::lock_guard<std::mutex> lock(to_send_m); // TODO don't like this.... might need to return error on a failed try_lock() instead.
+				to_send.push_back(msg);
+				std::cout << "message queued: " << msg.substr(0, msg.length()-2) << '\n';
+			}
 			doSend();
 		}
 	}
@@ -73,7 +75,7 @@ namespace educhat {
 			return;
 		}
 
-		to_send_m.lock(); // TODO: remove and introduce a try_lock() and way to show failure to caller
+		std::lock_guard<std::mutex> lock(to_send_m); // TODO: remove and introduce a try_lock() and way to show failure to caller
 
 		if (!to_send.empty()) {
 			send_in_progress = true;
@@ -87,9 +89,10 @@ namespace educhat {
 				{
 					if (!ec) {
 						std::cout << "sent: " << to_send.front();
-						to_send_m.lock();
-						to_send.pop_front();
-						to_send_m.unlock();
+						{
+							std::lock_guard<std::mutex> lock(to_send_m);
+							to_send.pop_front();
+						}
 						send_in_progress = false;
 
 						doSend();
@@ -101,8 +104,6 @@ namespace educhat {
 					}
 				});
 		}
-
-		to_send_m.unlock();	
 	}
 
 	std::string AsioSocket::recv()
@@ -139,9 +140,8 @@ namespace educhat {
 							recv_msg[i] = '\0';
 						}
 	
-						to_recv_m.lock();
+						std::lock_guard<std::mutex> lock(to_recv_m);
 						to_recv.push_back(recv_msg);
-						to_recv_m.unlock();
 					}
 					
 					recv_in_progress = false;
