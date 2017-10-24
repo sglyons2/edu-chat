@@ -2,7 +2,10 @@
 #define EDUCHAT_ASYNCSOCKET_HPP
 
 #include <deque>
+#include <mutex>
 #include <string>
+#include <thread>
+
 #include "Socket.hpp"
 
 
@@ -19,10 +22,14 @@ namespace educhat {
 	private:
 		int sockfd;
 		bool connected;
-		bool send_rdy;
-		bool recv_rdy;
-		void send();
 		std::deque<std::string> to_send;
+		std::deque<std::string> to_recv;
+		std::thread *t;
+		std::mutex to_send_m;
+		std::mutex to_recv_m;
+		void run();
+		void doSend();
+		void doRecv();
 	};
 
 } // namespace educhat

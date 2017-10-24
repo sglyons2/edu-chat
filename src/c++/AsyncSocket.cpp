@@ -14,8 +14,6 @@ namespace educhat {
 	AsyncSocket::AsyncSocket()
 	{
 		connected = false;
-		send_rdy = false;
-		recv_rdy = false;
 		sockfd = socket(AF_INET, SOCK_STREAM, 0);
 		fcntl(sockfd, F_SETFL, O_NONBLOCK);
 	}
@@ -23,6 +21,8 @@ namespace educhat {
 	AsyncSocket::~AsyncSocket()
 	{
 		close(sockfd); // consider if error occurs and does it matter?
+		t->join();
+		delete t;
 	}
 
 	void AsyncSocket::connect(const std::string addr, const std::string port)
@@ -34,7 +34,7 @@ namespace educhat {
 
 		int rv = getaddrinfo(addr.c_str(), port.c_str(), &hints, &servinfo);
 		if (rv) {
-			int e = errno;
+			//int e = errno;
 			// TODO: throw error for caller. we don't know UI
 			exit(1);
 		}
@@ -45,8 +45,6 @@ namespace educhat {
 			switch(e) {
 				case EISCONN:
 					connected = true;
-					send_rdy = true;
-					recv_rdy = true;
 				case EAGAIN:
 				case EALREADY:
 				case EINPROGRESS:
@@ -59,11 +57,13 @@ namespace educhat {
 			}
 		} else {
 			connected = true;
-			send_rdy = true;
-			recv_rdy = true;
 		}
 
 		freeaddrinfo(servinfo);
+
+		if (connected) {
+			t = new std::thread([this]{ run(); });
+		}
 	}
 
 	bool AsyncSocket::isConnected() const
@@ -71,69 +71,96 @@ namespace educhat {
 		return connected;
 	}
 
+	void AsyncSocket::run()
+	{
+		for(;;) {
+			doSend();
+			doRecv();	
+		}
+	}
+
 	#define MAXDATASIZE 512 // TODO: change as appropriate
 
 	void AsyncSocket::send(const std::string msg)
 	{
-		if (!msg.empty())
+		if (!msg.empty()) {
+			to_send_m.lock();
 			to_send.push_back(msg);
-
-		send();
+			to_send_m.unlock();
+		}
 	}
 
-	void AsyncSocket::send()
+	void AsyncSocket::doSend()
 	{
-		if (connected && send_rdy && !to_send.empty()) {
-			const std::string msg = to_send.front();
-			to_send.pop_front();
+		if (connected) {
+			to_send_m.lock();
+			if (!to_send.empty()) {
+				const std::string msg = to_send.front();
+				to_send.pop_front();
+	
+				int numbytes = ::send(sockfd, msg.c_str(), msg.length(), MSG_NOSIGNAL);
+	
+				if (numbytes == -1) {
+					int e = errno;
+					switch(e) {
+						case EAGAIN:
+							to_send.push_front(msg);
+							break;
+						default:
+							// TODO: handle more and better
+							exit(1);
+							break;
+					}
+				} else {
+					if (numbytes < (int) msg.length()) {
+						to_send.push_front(msg.substr(numbytes));
+					}
+				}
+			}
+			to_send_m.unlock();
+		}
+	}
 
-			int numbytes = ::send(sockfd, msg.c_str(), msg.length(), MSG_NOSIGNAL);
+	std::string AsyncSocket::recv()
+	{
+		std::string msg = "";
 
+		if (to_recv_m.try_lock()) {
+			if (!to_recv.empty()) {
+				msg = to_recv.front();
+				to_recv.pop_front();
+			}
+			to_recv_m.unlock();
+		}
+
+		return msg;
+	}
+
+	void AsyncSocket::doRecv()
+	{
+		if (connected) {
+			to_recv_m.lock();
+			char buf[MAXDATASIZE];
+			int numbytes = ::recv(sockfd, buf, MAXDATASIZE-1, 0);
 			if (numbytes == -1) {
 				int e = errno;
 				switch(e) {
 					case EAGAIN:
-						to_send.push_front(msg);
 						break;
 					default:
 						// TODO: handle more and better
 						exit(1);
 						break;
 				}
+			} else if (numbytes == 0) {
+				connected = false;
 			} else {
-				if (numbytes < (int) msg.length()) {
-					to_send.push_front(msg.substr(numbytes));
-				}
+				buf[numbytes] = '\0';
+				to_recv.push_back(buf);
 			}
+
+			to_recv_m.unlock();
 		}
-	}
-
-	std::string AsyncSocket::recv()
-	{
-		if (!isConnected() || !recv_rdy) {
-			return ""; // TODO: can i improve this?
-		}
-
-		char buf[MAXDATASIZE];
-		int numbytes = ::recv(sockfd, buf, MAXDATASIZE-1, 0);
-		if (numbytes == -1) {
-			int e = errno;
-			switch(e) {
-				case EAGAIN:
-					return "";
-				default:
-					// TODO: handle more and better
-					exit(1);
-					break;
-			}
-		} else if (numbytes == 0) {
-			connected = false;
-			return "";
-		}
-
-		buf[numbytes] = '\0';
-
-		return buf;
 	}
 
 } // namespace educhat
