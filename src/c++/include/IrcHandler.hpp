@@ -16,7 +16,7 @@ namespace educhat {
 		~IrcHandler();
 		void handleCommand(const std::string command);
 		bool isConnected();
-		void updateLog(const std::vector<std::string> &messages);
+		std::shared_ptr<struct message> getUpdate();
 	private:
 		std::shared_ptr<Socket> socket;
 	}
