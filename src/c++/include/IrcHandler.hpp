@@ -15,11 +15,11 @@ namespace educhat {
 		IrcHandler(std::shared_ptr<Socket> socket);
 		~IrcHandler();
 		void handleCommand(const std::string command);
-		bool isConnected();
-		std::shared_ptr<struct message> getUpdate();
+		bool isConnected() const;
+		std::shared_ptr<message> getUpdate();
 	private:
 		std::shared_ptr<Socket> socket;
-	}
+	};
 
 } // namespace educhat
 

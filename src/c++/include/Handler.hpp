@@ -21,8 +21,8 @@ namespace educhat {
 	public:
 		virtual void handleCommand(const std::string command) = 0;
 		virtual bool isConnected() const = 0;
-		virtual std::shared_ptr<struct message> getUpdate() = 0;
-	}
+		virtual std::shared_ptr<message> getUpdate() = 0;
+	};
 
 } // namespace educhat
 
