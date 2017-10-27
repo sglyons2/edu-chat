@@ -24,6 +24,25 @@ namespace educhat {
 		virtual std::shared_ptr<message> getUpdate() = 0;
 	};
 
+	inline void split(std::string command, std::vector<std::string> &words)
+	{
+		std::size_t index = 0;
+
+		do {
+			auto index_beg = command.find_first_not_of(" \r\n\0", index);
+			if (index_beg == std::string::npos) {
+				break;
+			}
+
+			index = command.find_first_of(" \r\n\0", index_beg);
+			if (index == std::string::npos) {
+				words.push_back(command.substr(index_beg));
+				break;
+			}
+			words.push_back(command.substr(index_beg, index-index_beg+1));
+		} while (++index);
+	};
+
 } // namespace educhat
 
 #endif

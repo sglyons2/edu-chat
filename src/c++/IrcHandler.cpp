@@ -15,12 +15,19 @@ namespace educhat {
 	void IrcHandler::handleCommand(const std::string command)
 	{
 		// split to get first "word"?
+		std::vector<std::string> words;
+
+		split(command, words);
 
 		// match first "word" to known command
 		// run command as appropriate
 		// refer to RFC 2812
 		// TODO: actually fix. keep for quick implementation testing
-		if (command.substr(0, 2) == "/c") {
+		if (words.empty()) {
+			return;
+		}
+
+		if (words[0] == "/connect" || words[0] == "/c") {
 			socket->connect("127.0.0.1", "6667");
 		} else {
 			socket->send(command);
