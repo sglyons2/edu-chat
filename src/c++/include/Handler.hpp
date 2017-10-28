@@ -39,7 +39,7 @@ namespace educhat {
 				words.push_back(command.substr(index_beg));
 				break;
 			}
-			words.push_back(command.substr(index_beg, index-index_beg+1));
+			words.push_back(command.substr(index_beg, index-index_beg));
 		} while (++index);
 	};
 
