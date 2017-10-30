@@ -15,12 +15,12 @@ namespace educhat {
 		socket.reset();
 	}
 
-	void IrcHandler::handleCommand(const std::string command)
+	void IrcHandler::handleCommand(const message &command)
 	{
 		// split to get first "word"?
 		std::vector<std::string> words;
 
-		split(command, words);
+		split(command.text, words);
 
 		// match first "word" to known command
 		// run command as appropriate
@@ -61,7 +61,7 @@ namespace educhat {
 				socket->send(irc_user_command);
 			}
 		} else {
-			socket->send("PRIVMSG " + channel + " :" + command + "\r\n");
+			socket->send("PRIVMSG " + command.owner + " :" + command.text + "\r\n");
 		}
 	}
 

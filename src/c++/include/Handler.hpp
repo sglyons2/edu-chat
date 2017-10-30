@@ -19,12 +19,12 @@ namespace educhat {
 
 	class Handler {
 	public:
-		virtual void handleCommand(const std::string command) = 0;
+		virtual void handleCommand(const message &command) = 0;
 		virtual bool isConnected() const = 0;
 		virtual std::shared_ptr<message> getUpdate() = 0;
 	};
 
-	inline void split(std::string command, std::vector<std::string> &words)
+	inline void split(const std::string command, std::vector<std::string> &words)
 	{
 		std::size_t index = 0;
 
