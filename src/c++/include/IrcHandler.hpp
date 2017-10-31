@@ -1,9 +1,9 @@
 #ifndef EDUCHAT_IRCHANDLER_HPP
 #define EDUCHAT_IRCHANDLER_HPP
 
+#include <deque>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "Handler.hpp"
 #include "Socket.hpp"
@@ -22,6 +22,7 @@ namespace educhat {
 		std::string channel;
 		std::string user;
 		std::string nick;
+		std::deque<std::shared_ptr<message>> messages;
 	};
 
 } // namespace educhat

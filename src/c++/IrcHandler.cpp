@@ -74,24 +74,38 @@ namespace educhat {
 	{
 		// recv from socket TODO consider try/catch
 		std::string received = socket->recv();
-		if (received.empty()) {
-			return nullptr;
+		if (!received.empty()) {
+			// one received can have multiple messages
+			std::vector<std::string> lines;
+			split(received, lines, "\r\n");
+	
+			for (auto line : lines) {
+				// process message. create a message and put in messages if neeeded
+				std::vector<std::string> words;
+				split(line, words);
+				std::string first = words[0];
+				if (first == "PING") {
+					socket->send("PONG\r\n");
+				} else {
+					std::shared_ptr<message> res(new message);
+					res->type = log_msg;
+					res->text = line;
+					res->owner = "channel";
+					time(&res->timestamp);
+					messages.push_back(res);
+				}
+			}
 		}
 
-		if (received.substr(0, 4) == "PING") {
-			socket->send("PONG\r\n");
-			return nullptr;
+		// take a message from messages, send it back
+		std::shared_ptr<message> msg = nullptr;
+		if (!messages.empty()) {
+			// handle message from socket
+			// refer to RFC 2812
+			// TODO: actually fix. keeping for quick implementation testing
+			msg = messages.front();
+			messages.pop_front();
 		}
-
-		std::shared_ptr<message> msg(new message);
-
-		// handle message from socket
-		// refer to RFC 2812
-		// TODO: actually fix. keeping for quick implementation testing
-		msg->type = log_msg;
-		msg->text = received;
-		msg->owner = "channel";
-		time(&msg->timestamp);
 
 		// return struct message pointer
 		return msg;
