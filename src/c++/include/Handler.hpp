@@ -24,23 +24,23 @@ namespace educhat {
 		virtual std::shared_ptr<message> getUpdate() = 0;
 	};
 
-	inline void split(const std::string command, std::vector<std::string> &words)
+	inline void split(const std::string s, std::vector<std::string> &to, const std::string delimiters = " ")
 	{
 		std::size_t index = 0;
 
 		do {
-			auto index_beg = command.find_first_not_of(" \r\n\0", index);
+			auto index_beg = s.find_first_not_of(delimiters, index);
 			if (index_beg == std::string::npos) {
 				break;
 			}
 
-			index = command.find_first_of(" \r\n\0", index_beg);
+			index = s.find_first_of(delimiters, index_beg);
 			if (index == std::string::npos) {
-				words.push_back(command.substr(index_beg));
+				to.push_back(s.substr(index_beg));
 				break;
 			}
-			words.push_back(command.substr(index_beg, index-index_beg));
-		} while (++index);
+			to.push_back(s.substr(index_beg, index-index_beg));
+		} while (true);
 	};
 
 } // namespace educhat
