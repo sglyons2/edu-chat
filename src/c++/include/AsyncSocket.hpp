@@ -15,6 +15,7 @@ namespace educhat {
 	public:
 		AsyncSocket();
 		~AsyncSocket();
+		void init();
 		void connect(const std::string addr, const std::string port);
 		bool isConnected() const;
 		void send(const std::string msg);
@@ -22,9 +23,11 @@ namespace educhat {
 	private:
 		int sockfd;
 		bool connected;
+		std::mutex connected_m;
 		std::deque<std::string> to_send;
 		std::deque<std::string> to_recv;
 		std::thread *t;
+		bool stop_thread;
 		std::mutex to_send_m;
 		std::mutex to_recv_m;
 		void run();

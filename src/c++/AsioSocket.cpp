@@ -7,12 +7,17 @@ namespace educhat {
 	AsioSocket::AsioSocket()
 		: socket(io_service)
 	{
-		connected = false;
-		connect_in_progress = false;
+		init();
 		send_in_progress = false;
 		recv_in_progress = false;
 		recv_msg[0] = '\0';
 		recv_msg[RECVMSG_MAXLENGTH-1] = '\0';
+	}
+
+	void AsioSocket::init()
+	{
+		connected = false;
+		connect_in_progress = false;
 	}
 
 	AsioSocket::~AsioSocket()
@@ -48,7 +53,9 @@ namespace educhat {
 				}
 			});
 
-		t = new std::thread([this](){ io_service.run(); });
+		if (t == nullptr) {
+			t = new std::thread([this](){ io_service.run(); });
+		}
 	}
 
 	bool AsioSocket::isConnected() const
