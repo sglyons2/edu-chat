@@ -35,7 +35,9 @@ namespace educhat {
 
 		if (first == "/connect" || first == "/c") {
 			if (words.size() > 2) {
-				socket->connect(words[1], words[2]);
+				server = words[1];
+				port = words[2];
+				socket->connect(server, port);
 			}
 		} else if (first == "/join" || first == "/j") {
 			if (words.size() > 1) {
@@ -72,6 +74,12 @@ namespace educhat {
 
 	std::shared_ptr<message> IrcHandler::getUpdate()
 	{
+		if (!isConnected()) {
+			// return connection error message?
+			// tells user to connect back, or automatically starts trying
+			// to reconnect?
+		}
+
 		// recv from socket TODO consider try/catch
 		std::string received = socket->recv();
 		if (!received.empty()) {

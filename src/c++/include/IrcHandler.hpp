@@ -19,6 +19,8 @@ namespace educhat {
 		std::shared_ptr<message> getUpdate();
 	private:
 		std::shared_ptr<Socket> socket;
+		std::string server;
+		std::string port;
 		std::string channel;
 		std::string user;
 		std::string nick;
