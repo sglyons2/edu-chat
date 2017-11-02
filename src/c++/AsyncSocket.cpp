@@ -7,25 +7,29 @@
 #include <string.h>
 #include <cstdlib>
 
-#include <iostream>
-
 #include "include/AsyncSocket.hpp"
 
 namespace educhat {
 
 	AsyncSocket::AsyncSocket()
 	{
-		init();
+		connected = false;
+		sockfd = socket(AF_INET, SOCK_STREAM, 0);
+		fcntl(sockfd, F_SETFL, O_NONBLOCK);
+		reset_recently = true;
 		t = nullptr;
 		stop_thread = false;
 	}
 
-	void AsyncSocket::init()
+	void AsyncSocket::reset()
 	{
-		close(sockfd);
-		connected = false;
-		sockfd = socket(AF_INET, SOCK_STREAM, 0);
-		fcntl(sockfd, F_SETFL, O_NONBLOCK);
+		if (!reset_recently) {
+			close(sockfd);
+			connected = false;
+			sockfd = socket(AF_INET, SOCK_STREAM, 0);
+			fcntl(sockfd, F_SETFL, O_NONBLOCK);
+			reset_recently = true;
+		}
 	}
 
 	AsyncSocket::~AsyncSocket()
@@ -56,8 +60,8 @@ namespace educhat {
 			int e = errno;
 			switch(e) {
 				case EISCONN:
-					std::cout << "connect: EISCONN connected\n";
 					connected = true;
+					reset_recently = false;
 					break;
 				case EAGAIN:
 				case EALREADY:
@@ -72,8 +76,8 @@ namespace educhat {
 					break;
 			}
 		} else {
-			std::cout << "connect: connected\n";
 			connected = true;
+			reset_recently = false;
 		}
 
 		freeaddrinfo(servinfo);
@@ -82,7 +86,6 @@ namespace educhat {
 		// if t exists, then all we should need is to connect and
 		// doRecv and doSend should start working right after!
 		if (connected && t == nullptr) {
-			std::cout << "connected. starting run()\n";
 			t = new std::thread([this]{ run(); });
 		}
 	}
@@ -94,7 +97,6 @@ namespace educhat {
 
 	void AsyncSocket::run()
 	{
-		std::cout << "run() running!\n";
 		while(!stop_thread) {
 			if (connected) {
 				doSend();
@@ -109,7 +111,6 @@ namespace educhat {
 	{
 		if (!msg.empty()) {
 			std::lock_guard<std::mutex> lock(to_send_m);
-			std::cout << "queueing: " << msg << "\n";
 			to_send.push_back(msg);
 		}
 	}
@@ -121,8 +122,6 @@ namespace educhat {
 			if (!to_send.empty()) {
 				const std::string msg = to_send.front();
 				to_send.pop_front();
-
-				std::cout << "sending: " << msg << "\n";
 	
 				int numbytes = ::send(sockfd, msg.c_str(), msg.length(), MSG_NOSIGNAL);
 	
@@ -133,7 +132,6 @@ namespace educhat {
 							to_send.push_front(msg);
 							break;
 						default:
-							std::cout << "doSend error\n";
 							// TODO: handle more and better
 							exit(1);
 							break;
@@ -175,17 +173,14 @@ namespace educhat {
 						break;
 					default:
 						// TODO: handle more and better
-						std::cout << "doRecv error\n";
 						exit(1);
 						break;
 				}
 			} else if (numbytes == 0) {
-				std::cout << "doRecv: lost connection\n";
 				connected = false;
-				close(sockfd);
+				reset();
 			} else {
 				buf[numbytes] = '\0';
-				std::cout << "doRecv: received: " << buf << "\n";
 				to_recv.push_back(buf);
 			}
 		}
