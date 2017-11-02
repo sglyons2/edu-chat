@@ -16,7 +16,7 @@ namespace educhat {
 	static_assert(std::is_base_of<Socket, T>::value, "T must derive from Socket");
 	public:
 		IrcHandler() {};
-		~IrcHandler() { socket.~T(); };
+		~IrcHandler() { };
 
 		void handleCommand(const message &command)
 		{
