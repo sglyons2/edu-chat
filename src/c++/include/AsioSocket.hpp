@@ -18,6 +18,7 @@ namespace educhat {
 	public:
 		AsioSocket();
 		~AsioSocket();
+		void reset();
 		void connect(const std::string addr, const std::string port);
 		bool isConnected() const;
 		void send(const std::string msg);

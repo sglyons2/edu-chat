@@ -15,15 +15,15 @@ namespace educhat {
 	public:
 		AsyncSocket();
 		~AsyncSocket();
-		void init();
+		void reset();
 		void connect(const std::string addr, const std::string port);
 		bool isConnected() const;
 		void send(const std::string msg);
 		std::string recv();
 	private:
 		int sockfd;
+		bool reset_recently;
 		bool connected;
-		std::mutex connected_m;
 		std::deque<std::string> to_send;
 		std::deque<std::string> to_recv;
 		std::thread *t;
