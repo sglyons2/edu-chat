@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "include/AsioSocket.hpp"
 
 namespace educhat {
@@ -12,17 +10,18 @@ namespace educhat {
 		recv_in_progress = false;
 		recv_msg[0] = '\0';
 		recv_msg[RECVMSG_MAXLENGTH-1] = '\0';
+		t = nullptr;
 	}
 
 	void AsioSocket::reset()
 	{
+		socket = boost::asio::ip::tcp::socket(io_service);
 		connected = false;
 		connect_in_progress = false;
 	}
 
 	AsioSocket::~AsioSocket()
 	{
-		std::cout << "destruction\n";
 		io_service.post([this]() { socket.close(); });
 		t->join();
 		delete t;
@@ -41,14 +40,11 @@ namespace educhat {
 		boost::asio::async_connect(socket, endpoint_iterator,
 			[this](boost::system::error_code ec, boost::asio::ip::tcp::resolver::iterator)
 			{
-				std::cout << "handler called!\n";
 				connect_in_progress = false;
 				if (!ec) {
 					connected = true;
-					std::cout << "connected\n";
 					doRecv();
 				} else {
-					std::cout << "connect failed\n";
 					exit(1);
 				}
 			});
@@ -69,7 +65,6 @@ namespace educhat {
 			{
 				std::lock_guard<std::mutex> lock(to_send_m); // TODO don't like this.... might need to return error on a failed try_lock() instead.
 				to_send.push_back(msg);
-				std::cout << "message queued: " << msg.substr(0, msg.length()-2) << '\n';
 			}
 			doSend();
 		}
@@ -87,15 +82,12 @@ namespace educhat {
 		if (!to_send.empty()) {
 			send_in_progress = true;
 	
-			std::cout << "sending: " << to_send.front().substr(0, to_send.front().length()-2) << "\n";
-	
 			boost::asio::async_write(socket,
 				boost::asio::buffer(to_send.front().c_str(),
 					to_send.front().length()),
 				[this](boost::system::error_code ec, std::size_t)
 				{
 					if (!ec) {
-						std::cout << "sent: " << to_send.front();
 						{
 							std::lock_guard<std::mutex> lock(to_send_m);
 							to_send.pop_front();
@@ -105,7 +97,6 @@ namespace educhat {
 						doSend();
 
 					} else {
-						std::cout << "send err\n";
 						socket.close();
 						exit(1);
 					}
@@ -154,7 +145,6 @@ namespace educhat {
 					recv_in_progress = false;
 					doRecv();
 				} else {
-					std::cout << "recv failed " << ec << "\n";
 					socket.close();
 					exit(1);
 				}
