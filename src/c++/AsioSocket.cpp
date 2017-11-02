@@ -14,7 +14,7 @@ namespace educhat {
 		recv_msg[RECVMSG_MAXLENGTH-1] = '\0';
 	}
 
-	void AsioSocket::init()
+	void AsioSocket::reset()
 	{
 		connected = false;
 		connect_in_progress = false;
