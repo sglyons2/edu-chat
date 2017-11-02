@@ -7,7 +7,7 @@ namespace educhat {
 	AsioSocket::AsioSocket()
 		: socket(io_service)
 	{
-		init();
+		reset();
 		send_in_progress = false;
 		recv_in_progress = false;
 		recv_msg[0] = '\0';
