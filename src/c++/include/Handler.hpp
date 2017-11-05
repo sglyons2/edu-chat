@@ -21,7 +21,7 @@ namespace educhat {
 	public:
 		virtual void handleCommand(const message &command) = 0;
 		virtual bool isConnected() const = 0;
-		virtual std::shared_ptr<message> getUpdate() = 0;
+		virtual std::unique_ptr<message> getUpdate() = 0;
 	};
 
 	inline void split(const std::string s, std::vector<std::string> &to, const std::string delimiters = " ")
