@@ -1,14 +1,17 @@
 #ifndef EDUCHAT_ASIOSOCKET_HPP
 #define EDUCHAT_ASIOSOCKET_HPP
 
-#include <deque>
-#include <mutex>
-#include <string>
-#include <thread>
+// namespace std
+#include <deque>          // deque
+#include <mutex>          // mutex
+#include <string>         // string
+#include <thread>         // thread
 
-#include <boost/asio.hpp>
+// namespace boost::asio
+#include <boost/asio.hpp> // io_service, ip::tcp::socket
 
-#include "Socket.hpp"
+// namespace educhat
+#include "Socket.hpp"     // Socket
 
 #define RECVMSG_MAXLENGTH 512
 

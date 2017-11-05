@@ -1,7 +1,8 @@
 #ifndef EDUCHAT_SOCKET_HPP
 #define EDUCHAT_SOCKET_HPP
 
-#include <string>
+// namespace std
+#include <string> // string
 
 namespace educhat {
 
