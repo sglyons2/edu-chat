@@ -1,12 +1,14 @@
 #ifndef EDUCHAT_ASYNCSOCKET_HPP
 #define EDUCHAT_ASYNCSOCKET_HPP
 
-#include <deque>
-#include <mutex>
-#include <string>
-#include <thread>
+// namespace std
+#include <deque>      // deque
+#include <mutex>      // mutex
+#include <string>     // string
+#include <thread>     // thread
 
-#include "Socket.hpp"
+// namespace educhat
+#include "Socket.hpp" // Socket
 
 
 namespace educhat {
@@ -15,6 +17,7 @@ namespace educhat {
 	public:
 		AsyncSocket();
 		~AsyncSocket();
+		// Resets the socket, usually for a new connection.
 		void reset();
 		void connect(const std::string addr, const std::string port);
 		bool isConnected() const;
@@ -30,7 +33,9 @@ namespace educhat {
 		bool stop_thread;
 		std::mutex to_send_m;
 		std::mutex to_recv_m;
-		void run();
+		void run(struct addrinfo *servinfo);
+		void stopThread();
+		void doConnect(struct addrinfo *servinfo);
 		void doSend();
 		void doRecv();
 	};

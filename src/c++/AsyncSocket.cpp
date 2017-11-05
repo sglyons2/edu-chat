@@ -28,34 +28,53 @@ namespace educhat {
 			connected = false;
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
 			fcntl(sockfd, F_SETFL, O_NONBLOCK);
+			stopThread();
 			reset_recently = true;
 		}
 	}
 
 	AsyncSocket::~AsyncSocket()
 	{
-		stop_thread = true;
-		t->join(); // will this ever actually end? can we actually join?
-		delete t;
+		stopThread();
 		close(sockfd); // consider if error occurs and does it matter?
+	}
+
+	void AsyncSocket::stopThread() {
+		stop_thread = true;
+		if (t->joinable()) {
+			t->join();
+			delete t;
+		}
 	}
 
 	void AsyncSocket::connect(const std::string addr, const std::string port)
 	{
-		struct addrinfo hints, *servinfo;
-		memset(&hints, 0, sizeof(hints));
-		hints.ai_family = AF_UNSPEC;
-		hints.ai_socktype = SOCK_STREAM;
-
-		int rv = getaddrinfo(addr.c_str(), port.c_str(), &hints, &servinfo);
-		if (rv) {
-			//int e = errno;
-			// TODO: throw error for caller. we don't know UI
-			return;
-			exit(1);
+		if (reset_recently) {
+			struct addrinfo hints, *servinfo;
+			memset(&hints, 0, sizeof(hints));
+			hints.ai_family = AF_UNSPEC;
+			hints.ai_socktype = SOCK_STREAM;
+	
+			int rv = getaddrinfo(addr.c_str(), port.c_str(), &hints, &servinfo);
+			if (rv) {
+				//int e = errno;
+				// TODO: throw error for caller. we don't know UI
+				return;
+				exit(1);
+			}
+	
+			t = new std::thread([this, servinfo](){ run(servinfo); });
 		}
+	}
 
-		rv = ::connect(sockfd, servinfo->ai_addr, servinfo->ai_addrlen);
+	bool AsyncSocket::isConnected() const
+	{
+		return connected;
+	}
+
+	void AsyncSocket::doConnect(struct addrinfo *servinfo)
+	{
+		int rv = ::connect(sockfd, servinfo->ai_addr, servinfo->ai_addrlen);
 		if (rv) {
 			int e = errno;
 			switch(e) {
@@ -79,31 +98,24 @@ namespace educhat {
 			connected = true;
 			reset_recently = false;
 		}
+	
+	}
 
+	void AsyncSocket::run(struct addrinfo *servinfo)
+	{
+		while (!stop_thread && !connected) {
+			doConnect(servinfo);
+		}
 		freeaddrinfo(servinfo);
 
-		// t == nullptr should work.
-		// if t exists, then all we should need is to connect and
-		// doRecv and doSend should start working right after!
-		if (connected && t == nullptr) {
-			t = new std::thread([this]{ run(); });
-		}
-	}
-
-	bool AsyncSocket::isConnected() const
-	{
-		return connected;
-	}
-
-	void AsyncSocket::run()
-	{
-		while(!stop_thread) {
+		while (!stop_thread) {
 			if (connected) {
 				doSend();
 				doRecv();	
 			}
 		}
 	}
+
 
 	#define MAXDATASIZE 512 // TODO: change as appropriate
 
